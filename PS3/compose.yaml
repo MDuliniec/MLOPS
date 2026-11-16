@@ -1,0 +1,22 @@
+services:
+  llamafile:
+    image: ${IMAGE}
+    build:
+      context: .
+      args:
+        LLAMAFILE_URL: ${LLAMAFILE_URL}
+        LLAMAFILE_SHA256: ${LLAMAFILE_SHA256}
+    container_name: llamafile
+    restart: unless-stopped
+    init: true
+    command: ["--port", "${PORT}", "-t", "${THREADS}"]
+    ports:
+      - "${BIND_ADDR}:${PORT}:${PORT}"
+    mem_limit: 1536m
+    cpus: 2.0
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/${PORT} && printf 'GET /health HTTP/1.0\\r\\n\\r\\n' >&3 && head -n1 <&3 | grep -q ' 200 '"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
