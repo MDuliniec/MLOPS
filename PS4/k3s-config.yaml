@@ -1,0 +1,9 @@
+node-ip: 192.168.56.10
+advertise-address: 192.168.56.10
+flannel-iface: enp0s9
+write-kubeconfig-mode: "644"
+disable:
+  - traefik
+  - servicelb
+kube-proxy-arg:
+  - "nodeport-addresses=192.168.56.10/32"
