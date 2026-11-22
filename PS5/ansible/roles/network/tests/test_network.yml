@@ -1,0 +1,21 @@
+---
+- name: Test network role
+  hosts: localhost
+  connection: local
+  become: true
+
+  roles:
+    - role: network
+
+  post_tasks:
+    - name: Verify host-only IP address is present on interface
+      ansible.builtin.command: "ip -4 addr show dev {{ network_host_only_iface }}"
+      register: ip_check
+      changed_when: false
+      failed_when: "(network_host_only_ip ~ '/24') not in ip_check.stdout"
+
+    - name: Verify SSH is listening on TCP port 22
+      ansible.builtin.wait_for:
+        host: "{{ network_host_only_ip }}"
+        port: "{{ network_ssh_port }}"
+        timeout: 10
