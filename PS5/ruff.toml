@@ -9,4 +9,4 @@ quote-style = "double"
 indent-style = "space"
 
 [lint.isort]
-known-first-party = ["smoke-test"]
+known-first-party = ["smoke_test"]
