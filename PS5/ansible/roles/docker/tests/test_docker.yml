@@ -1,0 +1,38 @@
+---
+- name: Test docker role
+  hosts: localhost
+  connection: local
+  become: true
+
+  roles:
+    - role: docker
+
+  post_tasks:
+    - name: Check docker version
+      ansible.builtin.command: docker --version
+      register: docker_ver
+      changed_when: false
+
+    - name: Check docker compose version
+      ansible.builtin.command: docker compose version
+      register: compose_ver
+      changed_when: false
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Run hello-world container
+      ansible.builtin.command: docker run --rm hello-world
+      register: hello
+      changed_when: false
+
+    - name: Assert docker works
+      ansible.builtin.assert:
+        that:
+          - "'Docker version' in docker_ver.stdout"
+          - "'Docker Compose version' in compose_ver.stdout"
+          - ansible_facts.services['docker.service'].state == 'running'
+          - ansible_facts.services['docker.service'].status == 'enabled'
+          - "'Hello from Docker!' in hello.stdout"
+        success_msg: "Docker role OK"
+        fail_msg: "Docker role failed"
