@@ -1,4 +1,4 @@
 ---
-network_host_only_iface: enp0s8
+network_host_only_iface: enp0s9
 network_host_only_ip: 192.168.56.10
 network_ssh_port: 22
