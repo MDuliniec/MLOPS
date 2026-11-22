@@ -15,9 +15,7 @@ def test_check_health_returns_true_on_200() -> None:
         result = check_health("http://192.168.56.10:30080/health", timeout=3.0)
 
     assert result is True
-    mock_urlopen.assert_called_once_with(
-        "http://192.168.56.10:30080/health", timeout=3.0
-    )
+    mock_urlopen.assert_called_once_with("http://192.168.56.10:30080/health", timeout=3.0)
 
 
 def test_check_health_returns_false_on_non_200() -> None:

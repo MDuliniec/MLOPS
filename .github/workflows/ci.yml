@@ -26,3 +26,21 @@ jobs:
 
       - name: Run ruff format check
         run: ruff format --check --config PS5/ruff.toml PS5
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: pip install pytest pytest-cov
+
+      - name: Run pytest with coverage
+        working-directory: PS5/app
+        run: python -m pytest --cov=smoke_test --cov-report=term-missing --cov-fail-under=80
