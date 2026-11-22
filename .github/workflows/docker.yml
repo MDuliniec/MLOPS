@@ -20,6 +20,7 @@ jobs:
           failure-threshold: warning
 
   publish:
+    needs: hadolint
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
