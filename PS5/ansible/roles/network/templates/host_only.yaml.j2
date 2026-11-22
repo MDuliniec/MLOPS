@@ -1,0 +1,6 @@
+network:
+  version: 2
+  ethernets:
+    {{ network_host_only_iface }}:
+      addresses:
+        - {{ network_host_only_ip }}/24
