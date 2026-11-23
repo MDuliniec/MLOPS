@@ -1,0 +1,32 @@
+---
+- name: Test k3s role
+  hosts: localhost
+  connection: local
+  become: true
+
+  roles:
+    - role: k3s
+
+  post_tasks:
+    - name: Wait until node is Ready
+      ansible.builtin.command: k3s kubectl wait --for=condition=Ready node --all --timeout=60s
+      register: node_ready
+      until: node_ready.rc == 0
+      retries: 20
+      delay: 5
+      changed_when: false
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert k3s is running and enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['k3s.service'].state == 'running'
+          - ansible_facts.services['k3s.service'].status == 'enabled'
+
+    - name: Verify Kubernetes API port is open
+      ansible.builtin.wait_for:
+        host: "{{ k3s_node_ip }}"
+        port: 6443
+        timeout: 30

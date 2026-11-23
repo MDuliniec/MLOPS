@@ -1,0 +1,38 @@
+---
+- name: Ensure curl is installed
+  ansible.builtin.apt:
+    name: curl
+    state: present
+    update_cache: true
+
+- name: Create k3s config directory
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    mode: "0755"
+
+- name: Configure k3s
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml
+    mode: "0644"
+  notify: Restart k3s
+
+- name: Download k3s install script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /usr/local/bin/k3s-install.sh
+    mode: "0755"
+
+- name: Install k3s
+  ansible.builtin.command: /usr/local/bin/k3s-install.sh
+  environment:
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Start and enable k3s service
+  ansible.builtin.service:
+    name: k3s
+    state: started
+    enabled: true
