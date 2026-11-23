@@ -16,4 +16,16 @@ spec:
         - name: llamafile
           image: ghcr.io/mduliniec/mlops:__IMAGE_TAG__
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
