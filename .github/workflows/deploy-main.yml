@@ -1,0 +1,29 @@
+name: Deploy to Prod
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate manifests with kubeconform
+        run: kubeconform -strict -summary PS5/k8s
+
+      - name: Render manifest with commit SHA and apply to k3s
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}:${{ github.sha }}"
+          sed "s|__IMAGE_TAG__|${IMAGE}|g" PS5/k8s/deployment.yaml > /tmp/deployment-rendered.yaml
+          sudo k3s kubectl apply -f /tmp/deployment-rendered.yaml
+          sudo k3s kubectl apply -f PS5/k8s/service.yaml
+          if ! sudo k3s kubectl rollout status deployment/mlops-ps5 --timeout=120s; then
+            sudo k3s kubectl rollout undo deployment/mlops-ps5
+            exit 1
+          fi

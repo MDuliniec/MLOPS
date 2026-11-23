@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlops-ps5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlops-ps5
+  template:
+    metadata:
+      labels:
+        app: mlops-ps5
+    spec:
+      containers:
+        - name: llamafile
+          image: ghcr.io/mduliniec/mlops:__IMAGE_TAG__
+          ports:
+            - containerPort: 8080
