@@ -1,0 +1,9 @@
+node-ip: {{ k3s_node_ip }}
+advertise-address: {{ k3s_node_ip }}
+flannel-iface: {{ k3s_flannel_iface }}
+write-kubeconfig-mode: "644"
+disable:
+  - traefik
+  - servicelb
+kube-proxy-arg:
+  - "nodeport-addresses={{ k3s_node_ip }}/32"

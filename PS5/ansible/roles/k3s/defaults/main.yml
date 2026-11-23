@@ -1,0 +1,4 @@
+---
+k3s_version: "v1.31.4+k3s1"
+k3s_node_ip: "{{ network_host_only_ip | default('192.168.56.10') }}"
+k3s_flannel_iface: "{{ network_host_only_iface | default('enp0s9') }}"
