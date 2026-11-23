@@ -46,3 +46,26 @@ jobs:
           push: true
           tags: ${{ env.IMAGE }}:${{ github.sha }}
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  deploy:
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Apply manifests to k3s
+        run: |
+          sed "s|__IMAGE_TAG__|${{ github.sha }}|g" PS5/k8s/deployment.yaml > /tmp/deployment-rendered.yaml
+          sudo k3s kubectl apply -f /tmp/deployment-rendered.yaml
+          sudo k3s kubectl apply -f PS5/k8s/service.yaml
+
+      - name: Verify rollout and smoke test, roll back on failure
+        run: |
+          if ! sudo k3s kubectl rollout status deployment/mlops-ps5 --timeout=10m || ! python3 PS5/app/smoke_test.py; then
+            sudo k3s kubectl rollout undo deployment/mlops-ps5
+            exit 1
+          fi
