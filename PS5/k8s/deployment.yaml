@@ -4,6 +4,7 @@ metadata:
   name: mlops-ps5
 spec:
   replicas: 1
+  progressDeadlineSeconds: 90
   selector:
     matchLabels:
       app: mlops-ps5
@@ -26,6 +27,6 @@ spec:
             failureThreshold: 60
           readinessProbe:
             httpGet:
-              path: /health
+              path: /zly
               port: http
             periodSeconds: 5
