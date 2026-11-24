@@ -19,6 +19,18 @@
     state: present
     enabled: true
 
+- name: Remove conflicting distribution packages
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-doc
+      - docker-compose
+      - docker-compose-v2
+      - podman-docker
+      - containerd
+      - runc
+    state: absent
+
 - name: Install Docker packages
   ansible.builtin.apt:
     name: "{{ docker_packages }}"
